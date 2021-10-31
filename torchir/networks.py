@@ -1,11 +1,17 @@
 from collections import OrderedDict
+from math import pi
+
 import numpy as np
 import torch
 from torch import nn
-from math import pi
 from torch.nn.modules.utils import _ntuple
-from .utils import ScaledTanH, ScalingAF
-from .transformers import rotation_matrix_eff, scaling_matrix_eff, shearing_matrix_eff
+
+from torchir.utils import ScaledTanH, ScalingAF
+from torchir.transformers import (
+    rotation_matrix_eff,
+    scaling_matrix_eff,
+    shearing_matrix_eff,
+)
 
 
 class ConvBlock(nn.Sequential):

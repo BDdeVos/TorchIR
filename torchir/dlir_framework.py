@@ -1,12 +1,17 @@
 from torch import nn, Tensor
-from .utils import Resampler
-from .transformers import Transformer
+
+from torchir.utils import Resampler
+from torchir.transformers import Transformer
 
 
 class DLIRFramework(nn.Module):
     """Deep Learning Image Registration (DLIR) Framework, a pipeline for transformers.
 
     The framework is an adaptation of the code presented in `De Vos 2019 <https://www.sciencedirect.com/science/article/pii/S1361841518300495>`_.
+
+    Note: The framework differs from the original paper in the sense that DVFs are not combined by
+    addition, but by composition which should result in an increase of registration precision in
+    most cases `Hering et al. 2019 <https://link.springer.com/chapter/10.1007/978-3-030-32226-7_29>`_.
 
     """
 

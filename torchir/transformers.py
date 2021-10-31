@@ -2,7 +2,8 @@ import numpy as np
 import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
-from .utils import identity_grid, Resampler
+
+from torchir.utils import identity_grid, Resampler
 
 
 class Transformer(nn.Module):
