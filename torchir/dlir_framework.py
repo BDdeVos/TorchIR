@@ -12,7 +12,6 @@ class DLIRFramework(nn.Module):
     Note: The framework differs from the original paper in the sense that DVFs are not combined by
     addition, but by composition which should result in an increase of registration precision in
     most cases `Hering et al. 2019 <https://link.springer.com/chapter/10.1007/978-3-030-32226-7_29>`_.
-
     """
 
     def __init__(self, only_last_trainable: bool = True, return_field: bool = False):
@@ -22,29 +21,20 @@ class DLIRFramework(nn.Module):
         self.only_last_trainable = only_last_trainable
         self.return_field = return_field
 
-    def add_stage(self, stage: nn.Module):
-        assert isinstance(stage, Transformer), "Input should be a Transformer object."
+    def add_stage(self, network: nn.Module, transformer: Transformer):
         if self.only_last_trainable and len(self.stages) > 0:
             self.stages[-1].eval()
             for param in self.stages[-1].parameters():
                 param.requires_grad = False
-
-        stage.return_field = True
+        stage = nn.ModuleDict({"network": network, "transformer": transformer})
         self.stages.append(stage)
 
     def forward(self, fixed: Tensor, moving: Tensor) -> Tensor:
-        coord_field = None
+        coord_grid = None
+        warped = moving
         for stage in self.stages:
-            if coord_field is None:
-                warped = moving
-            else:
-                warped = self._resampler(moving, coord_field)
-
-            coord_field = stage(fixed, warped, coord_field)
-
-        if self.return_field:
-            ret = coord_field
-        else:
-            ret = self._resampler(moving, coord_field)
-
-        return ret
+            parameters = stage["network"](fixed, warped)
+            warped, coord_grid = stage["transformer"](
+                parameters, fixed, moving, coord_grid, return_coordinate_grid=True
+            )
+        return warped
