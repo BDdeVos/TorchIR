@@ -153,9 +153,6 @@ class BsplineTransformer(Transformer):
 
 
 class AffineTransformer(Transformer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def apply_transform(
         self,
         parameters: Tuple[Tensor],
@@ -163,6 +160,17 @@ class AffineTransformer(Transformer):
         moving_image: Tensor,
         coordinate_grid: Optional[Tensor] = None,
     ) -> Tensor:
+        """
+        :param parameters: translation, rotation, scale, shear
+        :param fixed_image:
+        :param moving_image:
+        :param coordinate_grid:
+        :return:
+
+        Note: If ndim == 3, number of parameters are 3 for translation, rotation, and scale; and
+        6 for shear. If ndim == 2, number of parameters are 2 for translation, scale, and shear;
+        and 1 for rotation
+        """
         translation, rotation, scale, shear = parameters
 
         if self.ndim == 2:
@@ -180,7 +188,7 @@ class AffineTransformer(Transformer):
             @ rot_mat
         )
 
-        f_origin = (
+        f_origin = -(
             torch.tensor(
                 fixed_image.shape[2:],
                 dtype=fixed_image.dtype,
@@ -188,7 +196,7 @@ class AffineTransformer(Transformer):
             )[None]
             / 2
         )
-        m_origin = (
+        m_origin = -(
             torch.tensor(
                 moving_image.shape[2:],
                 dtype=moving_image.dtype,
