@@ -270,6 +270,5 @@ class DiffeomorphicFlowTransformer(Transformer):
             dvf.shape[2:], stackdim=0, dtype=dtype, device=device
         )
         if coordinate_grid:
-            assert shape == coordinate_grid.shape[2:]
             new_grid = self._resampler(coordinate_grid, new_grid)
         return new_grid
